@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>洋洋肚子餓之大學生今天吃什麼？</title>
+    <style>
+        :root {
+            --neon-pink: #ff007f;
+            --neon-blue: #00f3ff;
+            --neon-green: #39ff14;
+            --neon-yellow: #fffb00;
+            --bg-color: #1a1a1a;
+            --text-color: #fff;
+        }
+        
+        body { margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color); font-family: "Microsoft JhengHei", sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; transition: background 0.5s ease; }
+        .neon-title { font-size: 2.5rem; margin-top: 30px; text-align: center; color: #fff; text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px var(--neon-pink), 0 0 40px var(--neon-pink), 0 0 80px var(--neon-pink); border: 3px solid var(--neon-blue); padding: 10px 20px; border-radius: 15px; box-shadow: 0 0 15px var(--neon-blue), inset 0 0 15px var(--neon-blue); }
+        
+        body.luxury-mode { background: linear-gradient(135deg, #2b1f00, #5c4300, #ffd700, #2b1f00); background-size: 400% 400%; animation: gradientBG 5s ease infinite; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        body.luxury-mode .neon-title { text-shadow: 0 0 10px #fff, 0 0 20px #ffd700, 0 0 40px #ffaa00; border-color: #ffd700; box-shadow: 0 0 15px #ffd700, inset 0 0 15px #ffd700; }
+        
+        .container { max-width: 600px; width: 90%; text-align: center; margin-bottom: 50px; z-index: 2; }
+        .category-group { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin: 25px 0; }
+        .cat-btn { background-color: transparent; color: var(--neon-blue); border: 2px solid var(--neon-blue); padding: 10px 20px; font-size: 1.1rem; border-radius: 25px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 10px var(--neon-blue); }
+        .cat-btn:hover, .cat-btn.active { background-color: var(--neon-blue); color: #000; box-shadow: 0 0 20px var(--neon-blue); }
+        
+        .filters { background: rgba(0, 0, 0, 0.6); border: 1px dashed var(--neon-green); padding: 15px; border-radius: 10px; margin-bottom: 30px; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .filter-label { cursor: pointer; color: var(--neon-green); font-size: 1rem; display: flex; align-items: center; gap: 5px; }
+        .filter-label input { cursor: pointer; accent-color: var(--neon-pink); width: 18px; height: 18px; }
+        
+        .slot-machine { background: #222; border: 5px solid var(--neon-yellow); border-radius: 20px; padding: 20px; position: relative; box-shadow: 0 0 30px var(--neon-yellow); }
+        .slot-display { background: #fff; color: #000; font-size: 2rem; font-weight: bold; height: 80px; display: flex; align-items: center; justify-content: center; border-radius: 10px; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); overflow: hidden; margin-bottom: 20px; }
+        .lever { background-color: #ff3b3b; color: white; border: none; padding: 15px 40px; font-size: 1.5rem; font-weight: bold; border-radius: 10px; cursor: pointer; box-shadow: 0 8px 0 #9c0000, 0 15px 20px rgba(0,0,0,0.4); transition: all 0.1s; }
+        .lever:active { transform: translateY(8px); box-shadow: 0 0px 0 #9c0000, 0 5px 10px rgba(0,0,0,0.4); }
+        .lever:disabled { background-color: #555; box-shadow: 0 8px 0 #333; cursor: not-allowed; transform: none; }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 100; flex-direction: column; }
+        .modal-content { background: #111; border: 3px solid var(--neon-pink); padding: 40px 30px; border-radius: 20px; text-align: center; box-shadow: 0 0 40px var(--neon-pink); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-width: 80%; }
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .result-text { font-size: 2.5rem; color: var(--neon-yellow); margin-bottom: 30px; font-weight: bold; }
+        .action-btn { padding: 10px 20px; font-size: 1.2rem; margin: 10px; border-radius: 10px; cursor: pointer; border: none; font-weight: bold; }
+        .btn-map { background: #4285F4; color: white; }
+        .btn-retry { background: #fbbc05; color: black; }
+        .btn-close { background: #ea4335; color: white; }
+        .angry-modal { font-size: 4rem; }
+        #fireworks-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 90; display: none; }
+    </style>
+</head>
+<body>
+    <h1 class="neon-title">洋洋肚子餓 <br> 🎰 今天吃什麼？</h1>
+    <div class="container">
+        
+        <div class="category-group" id="categories">
+            <button class="cat-btn active" data-cat="budget50_100">50-100元</button>
+            <button class="cat-btn" data-cat="budget200">200元</button>
+            <button class="cat-btn" data-cat="budget300">300元</button>
+            <button class="cat-btn" data-cat="indulge">放縱餐 👑</button>
+            <button class="cat-btn" data-cat="special">特別版 👽</button>
+        </div>
+        
+        <div class="filters">
+            <label class="filter-label"><input type="checkbox" id="noBeef"> 不吃牛</label>
+            <label class="filter-label"><input type="checkbox" id="noSeafood"> 不吃海鮮</label>
+            <label class="filter-label"><input type="checkbox" id="noNoodles"> 不吃麵</label>
+            <label class="filter-label"><input type="checkbox" id="noCilantro"> 不吃香菜</label>
+            <label class="filter-label"><input type="checkbox" id="noSpicy"> 不吃辣</label>
+        </div>
+        
+        <div class="slot-machine">
+            <div class="slot-display" id="slotDisplay">請選擇預算並拉下搖桿</div>
+            <button class="lever" id="spinBtn">🎰 拉下 PULL</button>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="resultModal">
+        <canvas id="fireworks-canvas"></canvas>
+        <div class="modal-content">
+            <div class="result-text" id="finalResultText"></div>
+            <div>
+                <button class="action-btn btn-map" id="mapBtn">📍 去 Google Map 找找</button>
+                <button class="action-btn btn-retry" id="retryBtn">🔄 不滿意重抽</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="angryModal">
+        <div class="modal-content angry-modal">
+            <div style="font-size: 6rem; margin-bottom: 20px;">😡</div>
+            <div style="color: #ff3b3b; font-size: 2rem; font-weight: bold; margin-bottom: 20px;">再挑就去吃土啦！</div>
+            <button class="action-btn btn-close" id="closeAngryBtn">我知道錯了，讓我繼續抽...</button>
+        </div>
+    </div>
+    
+    <script>
+        const foodData = {
+            budget50_100: ["滷肉飯+貢丸湯", "雞肉飯便當", "鍋燒意麵", "蝦仁炒飯", "什錦炒麵", "乾麵+滷蛋", "擔仔麵", "肉燥飯+魚皮湯", "碗粿+浮水魚羹", "筒仔米糕+排骨酥湯", "蔥肉餅", "大腸包小腸", "炸雞排", "鹽酥雞", "滷味", "麻辣燙", "水餃15顆", "鍋貼10顆+酸辣湯", "蔥抓餅加蛋", "蚵仔麵線", "肉圓", "刈包", "豬血糕+甜不辣", "雞蛋糕+珍奶", "潤餅", "燒肉飯", "雞腿便當", "排骨便當", "控肉飯", "台式咖哩飯", "蛋包飯", "麻醬涼麵", "廣東粥", "虱目魚粥", "豬腸冬粉", "米粉湯", "肉羹麵", "鴨肉飯", "火雞肉飯", "鱔魚意麵", "花枝羹", "脆皮臭豆腐", "蚵仔煎", "生炒花枝", "藥燉排骨", "羊肉炒麵", "豬腳飯", "烤肉飯", "傳統飯糰", "總匯三明治"],
+            budget200: ["夜市平價牛排", "百元小火鍋", "義大利麵", "奶油燉飯", "日式豬排定食", "綜合壽司拼盤", "生魚片丼飯", "韓式石鍋拌飯", "韓式部隊鍋", "泰式打拋豬飯", "月亮蝦餅+奶茶", "港式飲茶小點", "燒臘三寶飯加肉", "經典牛肉麵+小菜", "羊肉爐個人鍋", "麻油雞麵線", "薑母鴨個人鍋", "平價鐵板燒", "咖哩豬排飯", "豚骨拉麵", "日式沾麵", "烏龍麵定食", "美式漢堡套餐", "個人小披薩", "炸肉捲/海鮮雙拼+鹹粥", "墨西哥捲餅", "越式生牛肉河粉", "印尼炒麵套餐", "泰式冬蔭功湯麵", "澎湃海鮮粥", "鮮魚湯定食", "鹽烤魚定食", "平價鰻魚飯", "壽喜燒個人鍋", "串燒拼盤", "居酒屋小食", "精緻低卡便當", "舒肥雞胸溫沙拉", "早午餐大拼盤", "鬆餅下午茶", "日式舒芙蕾", "千層蛋糕+咖啡", "網美咖啡廳簡餐", "烤鴨捲餅", "砂鍋魚頭個人鍋", "薑絲大腸套餐", "客家板條+熱炒", "甕仔雞個人餐", "平價麻辣火鍋", "迴轉壽司（爽吃6盤）"],
+            budget300: ["精緻鐵板燒套餐", "中價位沙朗牛排", "冠軍日式拉麵+炸物", "海鮮總匯義大利麵", "黑松露野菇燉飯", "連鎖品牌豬排飯", "特上海鮮丼", "炙燒握壽司套餐", "韓式烤肉單人餐", "平價銅盤烤肉吃到飽", "泰式綠咖哩套餐", "港式茶餐廳特餐", "半筋半肉冠軍牛肉麵", "單人酸菜白肉鍋", "剝皮辣椒雞湯套餐", "肉量加倍燒肉丼飯", "質感居酒屋串燒", "手打牛肉漢堡+精釀啤酒", "全日早午餐含牛排", "法式甜點+手沖咖啡", "蔬食百匯自助吧", "頂級食材健康餐盒", "舒肥牛排沙拉", "義式披薩+炸雞拼盤", "墨西哥法士達鐵板", "印度咖哩+烤餅套餐", "越式高階經典套餐", "居酒屋生啤+烤串", "炸蝦天婦羅定食", "日本和牛漢堡排", "蒲燒鯛魚飯定食", "精緻石頭火鍋", "單人麻辣鴛鴦鍋", "小份砂鍋魚頭鍋", "泰式海鮮痛風鍋", "義式海鮮清湯套餐", "法式洋蔥湯+烤麵包", "德國豬腳小份", "紐奧良烤半雞套餐", "水牛城辣雞翅拼盤", "精緻熱炒2菜+炒飯", "鮑魚海鮮粥", "小份紅蟳米糕", "烏魚子炒飯", "單人避風塘炒蟹", "法式烤小羊排", "法式油封鴨腿", "西班牙海鮮燉飯", "海膽干貝義大利麵", "高檔網美浮誇冰品"],
+            indulge: ["和牛燒肉吃到飽", "頂級海鮮Buffet", "波士頓龍蝦大餐", "帝王蟹腳火鍋", "巨無霸戰斧牛排", "乾式熟成牛排", "無菜單板前日式料理", "五星級高檔鐵板燒", "豪華生魚片大船", "巨無霸漢堡大挑戰", "炸物大拼盤+家庭號可樂", "韓式炸雞全雞餐", "起司瀑布雙層披薩", "痛風海鮮大爆發鍋", "豪華麻辣鍋吃到飽", "脆皮烤乳豬特餐", "頂級炭烤鰻魚飯三吃", "黑鮪魚金三角大餐", "法式米其林經典全餐", "松露鵝肝菲力牛排", "魚子醬佐香檳套餐", "英式三層下午茶塔", "巨型熔岩巧克力蛋糕", "手工現做整顆千層蛋糕", "頂級宇治抹茶冰品總匯", "泰國蝦現烤吃到飽", "鮮烤帶殼牡蠣吃到飽", "帶皮羊肉爐吃到飽", "薑母鴨全餐加滿米酒", "砂鍋大魚頭全家餐", "滿漢全席豪華便當", "奢華和牛金箔滷肉飯", "海膽干貝和牛漢堡", "大份量戰斧豬排", "韓式起司排骨鍋", "芝加哥超厚深盤披薩", "德式香腸巨無霸拼盤", "特級肋眼牛排16oz", "A5和牛壽喜燒", "超巨豪華海鮮蒸氣塔", "龍虎石斑兩吃", "頂級魚翅佛跳牆", "一鴨三吃片皮烤鴨", "空運法國生蠔拼盤", "現撈活體海鮮代客料理", "伊比利生火腿起司拼盤", "頂級魚子醬舒芙蕾鬆餅", "一整桶美式炸雞腿", "頂級燕窩甜品", "極致豪華魚子醬海鮮丼"],
+            special: ["巷口神秘無名麵店", "阿嬤覺得你餓特製便當", "完全不調味健美水煮餐", "喝西北風（系統強制去喝水）", "隨便（隨便買第一眼看到的店）", "都好（跟著前面的人點）", "看你（打電話問朋友決定）", "都可以（閉眼指Google地圖）", "擲筊決定吃啥（沒筊就餓肚子）", "問Siri今天吃什麼", "回家吃媽媽煮的", "打開冰箱自己下廚", "乾吃科學麵不加調味料", "超商大亨堡只買麵包", "只吃法式甜點當正餐", "喝兩杯手搖飲代替一餐", "斷食一餐（讓腸胃休息）"]
+        };
+        
+        let currentCategory = "budget50_100";
+        let retryCount = 0;
+        let isSpinning = false;
+        let finalItemForMap = "";
+        let fireworkInterval;
+
+        const catBtns = document.querySelectorAll('.cat-btn');
+        const spinBtn = document.getElementById('spinBtn');
+        const slotDisplay = document.getElementById('slotDisplay');
+        const resultModal = document.getElementById('resultModal');
+        const finalResultText = document.getElementById('finalResultText');
+        const mapBtn = document.getElementById('mapBtn');
+        const retryBtn = document.getElementById('retryBtn');
+        const angryModal = document.getElementById('angryModal');
+        const closeAngryBtn = document.getElementById('closeAngryBtn');
+        const canvas = document.getElementById('fireworks-canvas');
+
+        catBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (isSpinning) return;
+                catBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentCategory = btn.getAttribute('data-cat');
+                if (currentCategory === 'indulge') {
+                    document.body.classList.add('luxury-mode');
+                    slotDisplay.textContent = "減肥永遠是明天的事！";
+                } else {
+                    document.body.classList.remove('luxury-mode');
+                    slotDisplay.textContent = "準備就緒";
+                }
+            });
+        });
+
+        function applyFilters(list) {
+            const noBeef = document.getElementById('noBeef').checked;
+            const noSeafood = document.getElementById('noSeafood').checked;
+            const noNoodles = document.getElementById('noNoodles').checked;
+            const noCilantro = document.getElementById('noCilantro').checked;
+            const noSpicy = document.getElementById('noSpicy').checked;
+            return list.filter(item => {
+                if (noBeef && /牛/.test(item)) return false;
+                if (noSeafood && /海鮮|魚|蝦|蟹|蛤|蚵|生魚片|魷|花枝|鱔|壽司|龍蝦|牡蠣|海膽|干貝|鮑/.test(item)) return false;
+                if (noNoodles && /麵|冬粉|米粉|拉麵|烏龍|河粉|板條|麵線|義大利/.test(item)) return false;
+                if (noCilantro && /香菜|麵線|肉圓|刈包|羹/.test(item)) return false; 
+                if (noSpicy && /辣|麻辣|剝皮辣椒|泰式|冬蔭功|水牛城/.test(item)) return false;
+                return true;
+            });
+        }
+
+        spinBtn.addEventListener('click', startSpin);
+        retryBtn.addEventListener('click', () => {
+            retryCount++;
+            resultModal.style.display = 'none';
+            stopFireworks();
+            if (retryCount === 3) {
+                setTimeout(() => { angryModal.style.display = 'flex'; }, 300);
+            } else {
+                startSpin();
+            }
+        });
+
+        closeAngryBtn.addEventListener('click', () => {
+            angryModal.style.display = 'none';
+            startSpin(); 
+        });
+
+        function startSpin() {
+            if (isSpinning) return;
+            isSpinning = true;
+            spinBtn.disabled = true;
+            let pool = applyFilters(foodData[currentCategory]);
+            if (pool.length === 0) pool = ["全被你過濾光了啦！強制吃土🪨"];
+            let spinTime = 0;
+            const spinDuration = 2000;
+            const spinInterval = 80;
+            const timer = setInterval(() => {
+                spinTime += spinInterval;
+                slotDisplay.textContent = pool[Math.floor(Math.random() * pool.length)];
+                if (spinTime >= spinDuration) {
+                    clearInterval(timer);
+                    finishSpin(pool);
+                }
+            }, spinInterval);
+        }
+
+        function finishSpin(pool) {
+            let finalResult;
+            if (Math.random() < 0.01) {
+                finalResult = "月底吃土🪨 (極低機率隱藏彩蛋)";
+            } else {
+                finalResult = pool[Math.floor(Math.random() * pool.length)];
+            }
+            slotDisplay.textContent = finalResult;
+            finalItemForMap = finalResult.replace(/（.*）|\(.*\)|吃到飽|爽吃.*/g, "").trim();
+            setTimeout(() => {
+                finalResultText.textContent = finalResult;
+                resultModal.style.display = 'flex';
+                startFireworks();
+                isSpinning = false;
+                spinBtn.disabled = false;
+            }, 500);
+        }
+
+        mapBtn.addEventListener('click', () => {
+            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(finalItemForMap)}`, '_blank');
+        });
+
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function createParticles(x, y) {
+            const colors = ['#ff007f', '#00f3ff', '#39ff14', '#fffb00', '#ffffff'];
+            for (let i = 0; i < 80; i++) {
+                particles.push({ x: x, y: y, vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.5) * 10, life: 1, color: colors[Math.floor(Math.random() * colors.length)] });
+            }
+        }
+
+        function animateFireworks() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, index) => {
+                p.x += p.vx; p.y += p.vy; p.vy += 0.1; p.life -= 0.02;
+                ctx.globalAlpha = Math.max(p.life, 0); ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI * 2); ctx.fill();
+                if (p.life <= 0) particles.splice(index, 1);
+            });
+            if (particles.length > 0 || Math.random() < 0.1) {
+                if(Math.random() < 0.05) createParticles(Math.random() * canvas.width, Math.random() * (canvas.height / 2));
+                fireworkInterval = requestAnimationFrame(animateFireworks);
+            }
+        }
+
+        function startFireworks() { canvas.style.display = 'block'; particles = []; createParticles(canvas.width / 2, canvas.height / 2); animateFireworks(); }
+        function stopFireworks() { cancelAnimationFrame(fireworkInterval); canvas.style.display = 'none'; ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    </script>
+</body>
+</html>
